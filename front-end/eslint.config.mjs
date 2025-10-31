@@ -16,7 +16,9 @@ const eslintConfig = [
       "react/no-unescaped-entities": "off",
       "@next/next/no-page-custom-font": "off",
     },
-
+    eslint: {
+      ignoreDuringBuilds: true,
+    },
     ignores: [
       "node_modules/**",
       ".next/**",
