@@ -1,6 +1,6 @@
 # 🏡 DREARL — Decentralized Real Estate and Land Registry
 
-> **DREARL (Decentralized Real Estate and Registry of Land)** is a blockchain-based property registry platform that enables secure, transparent, and tamper-proof land ownership verification — built on **Base** and powered by **Next.js + Hardhat**.
+> **DREARL (Decentralized Real Estate and Registry of Land)** is a blockchain-based property registry platform that enables secure, transparent, and tamper-proof land ownership verification — built on **Hedera** and powered by **Next.js + Hardhat**.
 
 ---
 
@@ -9,6 +9,7 @@
 Real estate fraud and opaque land registries are major challenges in many regions. **DREARL** solves this by leveraging blockchain to record land ownership as **verifiable on-chain assets**, ensuring transparency, trust, and instant property transfers without intermediaries.
 
 ### 🎯 Vision
+
 > “To make land ownership transparent, verifiable, and accessible to everyone through blockchain technology.”
 
 ---
@@ -20,7 +21,7 @@ DREARL combines **smart contracts** and a **Next.js frontend** into a fully dece
 ```mermaid
 graph TD
     A[User Interface (Next.js)] --> B[Smart Contracts (Hardhat + Solidity)]
-    B --> C[Blockchain (Base Network)]
+    B --> C[Blockchain (  Network)]
     A --> D[IPFS Storage for Documents]
     B --> E[Doma Protocol (RWA Integration)]
 
@@ -73,10 +74,10 @@ drearl-frontend/
 Layer	Technology
 Frontend	Next.js, Tailwind CSS, Wagmi, Ethers.js
 Smart Contracts	Solidity 0.8.27, Hardhat
-Network	Base (OP Stack)
+Network	Hedera (OP Stack)
 Storage	IPFS for documents
 Integration	Doma Protocol (Real World Assets)
-Deployment	Vercel (Frontend), BaseScan (Contracts)
+Deployment	Vercel (Frontend), HashScan (Contracts)
 🧠 User Flow
 
 Register Land:
@@ -100,7 +101,7 @@ npm ≥ 10.0.0
 
 Hardhat
 
-MetaMask wallet connected to Base testnet
+MetaMask wallet connected to hedera testnet
 
 Steps
 # Clone repository
@@ -114,7 +115,7 @@ npm install
 
 Compile & Deploy Contracts
 npx hardhat compile
-npx hardhat run scripts/deploy.js --network base-sepolia
+npx hardhat run scripts/deploy.js --network hederatestnet
 
 Run Frontend
 cd frontend
@@ -126,11 +127,6 @@ Visit http://localhost:3000
 
 ⚙️ Environment Variables
 
-Create a .env.local file in the project root:
-
-NEXT_PUBLIC_CONTRACT_ADDRESS=your_deployed_contract_address
-NEXT_PUBLIC_BASE_RPC_URL=https://base-sepolia.g.alchemy.com/v2/your_key
-NEXT_PUBLIC_TEMPLATE_CLIENT_ID=your_client_id
 
 🧾 Example Interaction
 
@@ -155,13 +151,12 @@ await contract.transferFrom(currentOwner, newOwner, tokenId);
 🧭 Roadmap
 Phase	Milestone
 ✅ Phase 1	Smart contracts + testnet deployment
-✅ Phase 2	Frontend integration with Base network
+✅ Phase 2	Frontend integration with Hedera network
 🚧 Phase 3	Doma Protocol integration for land tokenization
 🔜 Phase 4	Partnership with local government agencies
 🔜 Phase 5	Cross-border real estate marketplace
 🛡️ Security & Compliance
 
-Contracts verified on BaseScan
 
 Role-based access control for verifiers
 
@@ -187,3 +182,4 @@ Open a Pull Request 🚀
 
 This project is licensed under the MIT License — see the LICENSE
  file for details.
+```
