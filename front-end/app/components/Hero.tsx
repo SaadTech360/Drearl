@@ -1,5 +1,6 @@
-// components/Hero.tsx
 'use client'
+import Image from 'next/image';
+// components/Hero.tsx
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -133,10 +134,11 @@ const Hero: React.FC = () => {
               transition={{ duration: 4, repeat: Infinity }}
               className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-8 border border-blue-400/30 shadow-2xl shadow-blue-400/20"
             >
-              <img
+              <Image
                 src="https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=800"
                 alt="Futuristic Property"
                 className="w-full h-80 object-cover rounded-2xl mb-6"
+                width={800} height={320}
               />
               <div className="space-y-4">
                 <div className="flex items-center justify-between">

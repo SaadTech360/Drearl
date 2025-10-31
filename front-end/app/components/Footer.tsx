@@ -1,9 +1,9 @@
-// components/Footer.tsx
 'use client'
 
+import Image from 'next/image';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Globe as Globe2, Twitter, Linkedin, Send } from 'lucide-react';
+import { Twitter, Linkedin, Send } from 'lucide-react';
 
 import { useRouter } from 'next/navigation';
 
@@ -23,7 +23,7 @@ const Footer: React.FC = () => {
                 animate={{ rotate: 360 }}
                 transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
               >
-                <img src="/DREARL-LOGO.png" alt="DREARL Logo" className="h-12 w-auto" />
+                <Image src="/DREARL-LOGO.png" alt="DREARL Logo" className="h-12 w-auto" width={48} height={48} />
               </motion.div>
               <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                 DREARL

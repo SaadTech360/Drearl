@@ -2,17 +2,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Home, Briefcase, Plus, Search, X, MapPin, Building, Edit, Trash2, 
-  LayoutGrid, List, User, DollarSign, Image as ImageIcon, Eye, AlertTriangle,
+  Briefcase, Plus, Search, MapPin, Edit, Trash2, 
+  User, Eye, AlertTriangle,
   Mail, Phone, Wallet
 } from 'lucide-react';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
 import { useAppContext } from '@/app/context/AppContext';
 import AddPropertyModal from '@/app/components/modals/AddPropertyModal';
+import Image from 'next/image';
 
 // --- Mock Data and Types ---
 interface Asset {
@@ -38,6 +38,16 @@ interface Asset {
   owner?: string;
 }
 
+interface UserData {
+  role: string;
+  details: {
+    fullName: string;
+    location: string;
+    [key: string]: any;
+  };
+  walletAddress: string;
+}
+
 // --- Reusable Components ---
 const SkeletonCard = () => (
   <div className="bg-gray-800/50 border border-blue-500/10 rounded-2xl p-6 animate-pulse">
@@ -60,7 +70,7 @@ const InfoCard = ({ icon, title, value }: { icon: React.ReactNode, title: string
   </motion.div>
 );
 
-const PropertyCard = ({ prop, onEdit, onDelete, role, userData, onViewDetails }: { prop: Asset, onEdit: (p: Asset) => void, onDelete: (p: Asset) => void, role: string, userData: any, onViewDetails: (p: Asset) => void }) => (
+const PropertyCard = ({ prop, onEdit, onDelete, role, userData, onViewDetails }: { prop: Asset, onEdit: (p: Asset) => void, onDelete: (p: Asset) => void, role: string, userData: UserData | null, onViewDetails: (p: Asset) => void }) => (
   <motion.div
     layout
     initial={{ opacity: 0, scale: 0.8 }}
@@ -70,7 +80,7 @@ const PropertyCard = ({ prop, onEdit, onDelete, role, userData, onViewDetails }:
     className="bg-gray-800/50 border border-blue-500/20 rounded-2xl overflow-hidden group"
   >
     <div className="relative">
-      <img src={prop.imageCID || 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'} alt={prop.type} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
+      <Image src={prop.imageCID || 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'} alt={prop.type} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" width={1260} height={750} />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
       <div className="absolute bottom-4 left-4">
         <h3 className="text-2xl font-bold text-white">{prop.type === 'Land' ? `${prop.state}, ${prop.city}` : prop.name}</h3>
@@ -107,21 +117,14 @@ const PropertyCard = ({ prop, onEdit, onDelete, role, userData, onViewDetails }:
 // --- Main Dashboard Component ---
 const Dashboard = () => {
   const { isAddPropertyModalOpen, setAddPropertyModalOpen } = useAppContext();
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
   // Dashboard state
   const [assets, setAssets] = useState<Asset[]>([]);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false); // For Property Details Modal
-  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null); // For Property Details Modal
   const [role, setRole] = useState('Buyer'); // Default role
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Form state
-  const [formState, setFormState] = useState({});
-  const [errors, setErrors] = useState<any>({});
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -170,32 +173,10 @@ const Dashboard = () => {
     }
   }, [assets, isLoading]);
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Validation logic can be added here if needed
-
-    const newAsset: Asset = {
-      id: editingAsset ? editingAsset.id : Date.now(),
-      ...formState,
-      owner: userData.details.fullName,
-    } as Asset;
-
-    if (editingAsset) {
-      setAssets(assets.map(p => p.id === editingAsset.id ? newAsset : p));
-    } else {
-      setAssets([newAsset, ...assets]);
-    }
-    closeModal();
-  };
-
   const openModal = (asset: Asset | null) => {
     setEditingAsset(asset);
-    setFormState(asset ? asset : {});
-    setErrors({});
     setAddPropertyModalOpen(true);
   };
-
-  const closeModal = () => setAddPropertyModalOpen(false);
 
   const handleDelete = (assetToDelete: Asset) => {
     setAssets(assets.filter(p => p.id !== assetToDelete.id));
@@ -218,8 +199,9 @@ const Dashboard = () => {
   };
 
   const handleViewDetails = (asset: Asset) => {
-    setSelectedAsset(asset);
-    setIsDetailsModalOpen(true);
+    // setSelectedAsset(asset);
+    // setIsDetailsModalOpen(true);
+    console.log("View details for", asset)
   };
 
   const filteredAssets = assets.filter(p => {
@@ -383,7 +365,7 @@ const Dashboard = () => {
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </motion.div>
               <h2 className="text-2xl font-bold mt-6 mb-2">Are you sure?</h2>
-              <p className="text-gray-400 mb-8">This action is irreversible and will permanently delete the {assetToDelete?.type} at "{assetToDelete?.type === 'Land' ? `${assetToDelete.state}, ${assetToDelete.city}` : `Property`}".</p>
+              <p className="text-gray-400 mb-8">This action is irreversible and will permanently delete the {assetToDelete?.type} at &quot;{assetToDelete?.type === 'Land' ? `${assetToDelete.state}, ${assetToDelete.city}` : `Property`}&quot;.</p>
               <div className="flex justify-center gap-4">
                 <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setShowDeleteModal(false)} className="px-8 py-3 bg-gray-600 rounded-lg font-semibold">Cancel</motion.button>
                 <motion.button
@@ -402,36 +384,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
-const FormInput = ({ name, placeholder, value, onChange, error, icon, type = 'text' }: any) => {
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onChange((prev: any) => ({ ...prev, [name]: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  return (
-  <div>
-    <div className="relative">
-      <motion.input
-        type={type}
-        placeholder={placeholder}
-        onChange={type === 'file' ? handleFileChange : (e) => onChange((prev: any) => ({ ...prev, [name]: e.target.value }))}
-        animate={error ? { x: [-3, 3, -3, 3, 0] } : {}}
-        transition={{ duration: 0.3 }}
-        className={`w-full p-4 pl-12 bg-gray-700/50 rounded-lg border transition-all duration-300 ${
-          error ? 'border-red-500' : 'border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50'
-        } ${type === 'file' ? 'file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100' : ''}`}
-      />
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>
-    </div>
-    {error && <p className="text-red-500 text-sm mt-1 ml-2">{error}</p>}
-  </div>
-)};
 
 export default Dashboard;

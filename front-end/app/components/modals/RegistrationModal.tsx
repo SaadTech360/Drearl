@@ -7,28 +7,43 @@ import { X, User, Home, Briefcase, MapPin, Wallet } from 'lucide-react';
 import { useAppContext } from '@/app/context/AppContext';
 import { useAccount } from 'wagmi';
 
+interface LandownerFormData {
+  fullName?: string;
+  farmName?: string;
+  cropType?: string;
+  location?: string;
+  walletAddress?: string;
+}
+
+interface OfftakerFormData {
+  fullName?: string;
+  companyName?: string;
+  location?: string;
+  walletAddress?: string;
+}
+
 const RegistrationModal = () => {
   const { isRegistrationModalOpen, setRegistrationModalOpen, role, handleRegistrationSuccess } = useAppContext();
   const { address } = useAccount();
 
-  const [formData, setFormData] = useState<any>({});
-  const [errors, setErrors] = useState<any>({});
+  const [formData, setFormData] = useState<LandownerFormData | OfftakerFormData>({});
+  const [errors, setErrors] = useState<Partial<LandownerFormData> & Partial<OfftakerFormData>>({});
 
   useEffect(() => {
     if (address) {
-      setFormData((prev: any) => ({ ...prev, walletAddress: address }));
+      setFormData((prev) => ({ ...prev, walletAddress: address }));
     }
   }, [address]);
 
   const validate = () => {
-    const newErrors: any = {};
+    const newErrors: Partial<LandownerFormData> & Partial<OfftakerFormData> = {};
     const requiredFields = role === 'Landowner' 
       ? ['fullName', 'farmName', 'cropType', 'location']
       : ['fullName', 'companyName', 'location'];
 
     requiredFields.forEach(field => {
-      if (!formData[field]) {
-        newErrors[field] = 'This field is required';
+      if (!formData[field as keyof (LandownerFormData | OfftakerFormData)]) {
+        newErrors[field as keyof (LandownerFormData | OfftakerFormData)] = 'This field is required';
       }
     });
 
@@ -47,20 +62,20 @@ const RegistrationModal = () => {
     <div className="mb-4">
       <div className="relative">
         <motion.input
-          animate={errors[name] ? { x: [-3, 3, -3, 3, 0] } : {}}
+          animate={errors[name as keyof typeof errors] ? { x: [-3, 3, -3, 3, 0] } : {}}
           transition={{ duration: 0.3 }}
           type="text"
           name={name}
           placeholder={placeholder}
-          value={formData[name] || ''}
+          value={formData[name as keyof typeof formData] || ''}
           onChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
           className={`w-full p-4 pl-12 bg-gray-700/50 rounded-lg border transition-all duration-300 ${
-            errors[name] ? 'border-red-500' : 'border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50'
+            errors[name as keyof typeof errors] ? 'border-red-500' : 'border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50'
           }`}
         />
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>
       </div>
-      {errors[name] && <p className="text-red-500 text-sm mt-1 ml-2">{errors[name]}</p>}
+      {errors[name as keyof typeof errors] && <p className="text-red-500 text-sm mt-1 ml-2">{errors[name as keyof typeof errors]}</p>}
     </div>
   );
 

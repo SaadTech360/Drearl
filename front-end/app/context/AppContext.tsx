@@ -5,6 +5,12 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 
+interface UserData {
+  walletAddress?: string;
+  role?: string | null;
+  details?: any;
+}
+
 interface AppContextType {
   isWalletConnected: boolean;
   role: string | null;
@@ -18,7 +24,8 @@ interface AppContextType {
   isAddPropertyModalOpen: boolean;
   setAddPropertyModalOpen: (isOpen: boolean) => void;
   handleRoleSelect: (selectedRole: string) => void;
-  handleRegistrationSuccess: (details: any) => void;
+  handleRegistrationSuccess: (details: UserData) => void;
+  handleGetStarted: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -32,14 +39,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [isAddPropertyModalOpen, setAddPropertyModalOpen] = useState(false);
   const router = useRouter();
 
+  const handleGetStarted = () => {
+    setConnectModalOpen(true);
+  };
+
   const handleRoleSelect = (selectedRole: string) => {
     setRole(selectedRole);
     setRoleModalOpen(false);
     setRegistrationModalOpen(true);
   };
 
-  const handleRegistrationSuccess = (details: any) => {
-    const userData = {
+  const handleRegistrationSuccess = (details: UserData) => {
+    const userData: UserData = {
       walletAddress: address,
       role,
       details
@@ -64,7 +75,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       isAddPropertyModalOpen,
       setAddPropertyModalOpen,
       handleRoleSelect,
-      handleRegistrationSuccess
+      handleRegistrationSuccess,
+      handleGetStarted
     }}>
       {children}
     </AppContext.Provider>

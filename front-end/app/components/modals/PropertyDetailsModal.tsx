@@ -1,9 +1,10 @@
+import Image from 'next/image';
 
 'use client';
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MapPin, DollarSign, Building, User, Calendar, Tag, CheckCircle, ShoppingCart } from 'lucide-react';
+import { X, MapPin, DollarSign, Building, User, ShoppingCart } from 'lucide-react';
 
 interface Property {
   id: number;
@@ -48,7 +49,7 @@ const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ isOpen, onC
                 </motion.button>
               </div>
 
-              <img src={property.image} alt={property.name} className="w-full h-64 object-cover rounded-lg mb-6" />
+              <Image src={property.image} alt={property.name} className="w-full h-64 object-cover rounded-lg mb-6" width={600} height={256} />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="flex items-center gap-3 text-gray-300">

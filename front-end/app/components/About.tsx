@@ -1,6 +1,7 @@
-// components/About.tsx
 'use client'
 
+import Image from 'next/image';
+// components/About.tsx
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Lock, Users } from 'lucide-react';
@@ -20,7 +21,7 @@ const About: React.FC = () => {
             About DREARL
           </h2>
           <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-            We're building Africa's first comprehensive decentralized real estate platform, 
+            We&apos;re building Africa&apos;s first comprehensive decentralized real estate platform, 
             combining blockchain technology with traditional property management to create 
             transparent, secure, and accessible real estate solutions.
           </p>
@@ -85,7 +86,7 @@ const About: React.FC = () => {
             className="relative"
           >
             <div className="relative">
-              <img
+              <Image
                 src="https://images.pexels.com/photos/2462015/pexels-photo-2462015.jpeg?auto=compress&cs=tinysrgb&w=800"
                 alt="Modern Real Estate"
                 className="w-full h-96 object-cover rounded-3xl"

@@ -3,25 +3,46 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Home, MapPin, DollarSign, Hash, Image as ImageIcon, Building, Bath, Bed } from 'lucide-react';
+import { X, Home, MapPin, DollarSign, Hash, Image as ImageIcon, Bath, Bed } from 'lucide-react';
 import { useAppContext } from '@/app/context/AppContext';
+import Image from 'next/image';
+
+interface PropertyFormData {
+  name?: string;
+  landIndex?: number;
+  numberOfRooms?: number;
+  numberOfBathrooms?: number;
+  price?: number;
+  imageCID?: string;
+}
+
+interface LandFormData {
+  numberOfPlots?: number;
+  titleNumber?: number;
+  state?: string;
+  lga?: string;
+  city?: string;
+  pricePerPlot?: number;
+  coFoCID?: string;
+  imageCID?: string;
+}
 
 const AddPropertyModal = () => {
   const { isAddPropertyModalOpen, setAddPropertyModalOpen } = useAppContext();
   const [assetType, setAssetType] = useState('Property');
-  const [formData, setFormData] = useState<any>({});
-  const [errors, setErrors] = useState<any>({});
+  const [formData, setFormData] = useState<PropertyFormData | LandFormData>({});
+  const [errors, setErrors] = useState<Partial<PropertyFormData> & Partial<LandFormData>>({});
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const validate = () => {
-    const newErrors: any = {};
+    const newErrors: Partial<PropertyFormData> & Partial<LandFormData> = {};
     const requiredFields = assetType === 'Land'
       ? ['numberOfPlots', 'titleNumber', 'state', 'lga', 'city', 'pricePerPlot', 'coFoCID']
       : ['name', 'landIndex', 'numberOfRooms', 'numberOfBathrooms', 'price'];
 
     requiredFields.forEach(field => {
-      if (!formData[field]) {
-        newErrors[field] = 'This field is required';
+      if (!formData[field as keyof (PropertyFormData | LandFormData)]) {
+        newErrors[field as keyof (PropertyFormData | LandFormData)] = 'This field is required';
       }
     });
 
@@ -66,28 +87,22 @@ const AddPropertyModal = () => {
     <div className="mb-4">
       <div className="relative">
         <motion.input
-          animate={errors[name] ? { x: [-3, 3, -3, 3, 0] } : {}}
+          animate={errors[name as keyof typeof errors] ? { x: [-3, 3, -3, 3, 0] } : {}}
           transition={{ duration: 0.3 }}
           type={type}
           name={name}
           placeholder={placeholder}
-          value={formData[name] || ''}
+          value={formData[name as keyof typeof formData] || ''}
           onChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })}
           className={`w-full p-4 pl-12 bg-gray-700/50 rounded-lg border transition-all duration-300 ${
-            errors[name] ? 'border-red-500' : 'border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50'
+            errors[name as keyof typeof errors] ? 'border-red-500' : 'border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50'
           }`}
         />
         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">{icon}</div>
       </div>
-      {errors[name] && <p className="text-red-500 text-sm mt-1 ml-2">{errors[name]}</p>}
+      {errors[name as keyof typeof errors] && <p className="text-red-500 text-sm mt-1 ml-2">{errors[name as keyof typeof errors]}</p>}
     </div>
   );
-
-  const spring = {
-    type: "spring",
-    stiffness: 700,
-    damping: 30
-  };
 
   return (
     <AnimatePresence>
@@ -152,7 +167,7 @@ const AddPropertyModal = () => {
                   <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} />
                   <div className="flex flex-col items-center justify-center">
                     {imagePreview ? (
-                      <img src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded-lg mb-4" />
+                      <Image src={imagePreview} alt="Preview" className="w-32 h-32 object-cover rounded-lg mb-4" width={128} height={128} />
                     ) : (
                       <ImageIcon className="w-12 h-12 text-gray-500 mb-2" />
                     )}

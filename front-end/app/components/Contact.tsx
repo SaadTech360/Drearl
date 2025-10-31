@@ -117,7 +117,7 @@ const Contact: React.FC = () => {
                   { icon: Twitter, color: "from-blue-400 to-blue-600", name: "Twitter" },
                   { icon: Linkedin, color: "from-blue-500 to-blue-700", name: "LinkedIn" },
                   { icon: Send, color: "from-cyan-400 to-cyan-600", name: "Telegram" }
-                ].map((social, index) => (
+                ].map((social) => (
                   <motion.a
                     key={social.name}
                     whileHover={{ scale: 1.1, y: -2 }}

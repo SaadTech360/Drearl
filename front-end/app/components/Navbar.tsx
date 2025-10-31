@@ -1,10 +1,12 @@
-// components/Navbar.tsx
 'use client'
+
+import Image from 'next/image';
+// components/Navbar.tsx
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Globe as Globe2, Wallet, Menu, X, LayoutDashboard } from 'lucide-react';
+import { Wallet, Menu, X, LayoutDashboard } from 'lucide-react';
 import { useAccount } from "wagmi";
 
 
@@ -54,7 +56,7 @@ const Navbar: React.FC = () => {
             className="flex items-center gap-3 cursor-pointer"
             onClick={() => scrollToSection('hero')}
           >
-            <img src="/DREARL-LOGO.png" alt="DREARL Logo" className="h-8 w-auto sm:h-10" />
+            <Image src="/DREARL-LOGO.png" alt="DREARL Logo" className="h-8 w-auto sm:h-10" width={40} height={40} />
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
               DREARL
             </span>

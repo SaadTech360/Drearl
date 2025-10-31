@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Hero from '@/app/components/Hero';
 import About from '@/app/components/About';
 import Workflow from '@/app/components/Workflow';
@@ -12,12 +12,6 @@ import RoleSelectionModal from '@/app/components/modals/RoleSelectionModal';
 import RegistrationModal from '@/app/components/modals/RegistrationModal';
 
 function LandingPage() {
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden">
@@ -26,7 +20,7 @@ function LandingPage() {
       <Workflow />
       <Features />
       <Contact />
-      <Footer scrollToSection={scrollToSection} />
+      <Footer />
 
       <ConnectWalletModal />
       <RoleSelectionModal />
