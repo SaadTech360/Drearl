@@ -1,11 +1,12 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Home, MapPin, DollarSign, Hash, Image as ImageIcon, Bath, Bed } from 'lucide-react';
 import { useAppContext } from '@/app/context/AppContext';
 import Image from 'next/image';
+import { useAccount } from 'wagmi';
 
 interface PropertyFormData {
   name?: string;
@@ -28,7 +29,8 @@ interface LandFormData {
 }
 
 const AddPropertyModal = () => {
-  const { isAddPropertyModalOpen, setAddPropertyModalOpen } = useAppContext();
+  const { isAddPropertyModalOpen, setAddPropertyModalOpen, registerLand, registerProperty } = useAppContext();
+  const { address } = useAccount();
   const [assetType, setAssetType] = useState('Property');
   const [formData, setFormData] = useState<PropertyFormData | LandFormData>({});
   const [errors, setErrors] = useState<Partial<PropertyFormData> & Partial<LandFormData>>({});
@@ -53,21 +55,33 @@ const AddPropertyModal = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-      const { imageCID, ...rest } = formData;
-      const newAsset = {
-        id: Date.now(),
-        type: assetType,
-        isVerified: false,
-        forSale: true,
-        owner: userData.details.fullName,
-        ...rest,
-      };
-
-      const existingAssets = JSON.parse(localStorage.getItem('assets') || '[]');
-      localStorage.setItem('assets', JSON.stringify([...existingAssets, newAsset]));
+      if (assetType === 'Land') {
+        registerLand({
+          args: [
+            (formData as LandFormData).numberOfPlots,
+            (formData as LandFormData).state,
+            (formData as LandFormData).lga,
+            (formData as LandFormData).city,
+            (formData as LandFormData).pricePerPlot,
+            (formData as LandFormData).titleNumber,
+            (formData as LandFormData).imageCID,
+            (formData as LandFormData).coFoCID,
+          ],
+          from: address,
+        });
+      } else {
+        registerProperty({
+          args: [
+            (formData as PropertyFormData).landIndex,
+            (formData as PropertyFormData).numberOfRooms,
+            (formData as PropertyFormData).numberOfBathrooms,
+            (formData as PropertyFormData).price,
+            (formData as PropertyFormData).imageCID,
+          ],
+          from: address,
+        });
+      }
       setAddPropertyModalOpen(false);
-      window.dispatchEvent(new Event('storage'));
     }
   };
 

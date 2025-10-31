@@ -2,13 +2,14 @@
 'use client';
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { useAccount } from 'wagmi';
+import { useAccount, useContractRead, useContractWrite } from 'wagmi';
 import { useRouter } from 'next/navigation';
+import { contractAddress, contractAbi } from '../config';
 
 interface UserData {
   walletAddress?: string;
   role?: string | null;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 interface AppContextType {
@@ -26,6 +27,8 @@ interface AppContextType {
   handleRoleSelect: (selectedRole: string) => void;
   handleRegistrationSuccess: (details: UserData) => void;
   handleGetStarted: () => void;
+  registerLand: (data: any) => void;
+  registerProperty: (data: any) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -38,6 +41,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [isRegistrationModalOpen, setRegistrationModalOpen] = useState(false);
   const [isAddPropertyModalOpen, setAddPropertyModalOpen] = useState(false);
   const router = useRouter();
+
+  const { data: registeredLand, write: registerLand } = useContractWrite({
+    address: contractAddress as `0x${string}`,
+    abi: contractAbi,
+    functionName: 'registerLand',
+  });
+
+  const { data: registeredProperty, write: registerProperty } = useContractWrite({
+    address: contractAddress as `0x${string}`,
+    abi: contractAbi,
+    functionName: 'registerProperty',
+  });
 
   const handleGetStarted = () => {
     setConnectModalOpen(true);
@@ -76,7 +91,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setAddPropertyModalOpen,
       handleRoleSelect,
       handleRegistrationSuccess,
-      handleGetStarted
+      handleGetStarted,
+      registerLand,
+      registerProperty
     }}>
       {children}
     </AppContext.Provider>

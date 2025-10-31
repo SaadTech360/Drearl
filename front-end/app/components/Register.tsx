@@ -1,6 +1,8 @@
 
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAppContext } from "../context/AppContext";
+import { useAccount } from "wagmi";
 
 const Register = () => {
   const [formType, setFormType] = useState("land");
@@ -37,6 +39,8 @@ const Register = () => {
 };
 
 const RegisterLandForm = () => {
+  const { address } = useAccount();
+  const { registerLand } = useAppContext();
   const [formData, setFormData] = useState({
     numberOfPlots: "",
     state: "",
@@ -54,7 +58,6 @@ const RegisterLandForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
     const requiredFields: (keyof typeof formData)[] = ["numberOfPlots", "state", "lga", "city", "pricePerPlot", "titleNumber", "imageCID", "coFoCID"];
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -62,7 +65,19 @@ const RegisterLandForm = () => {
         return;
       }
     }
-    console.log(formData);
+    registerLand({
+      args: [
+        formData.numberOfPlots,
+        formData.state,
+        formData.lga,
+        formData.city,
+        formData.pricePerPlot,
+        formData.titleNumber,
+        formData.imageCID,
+        formData.coFoCID,
+      ],
+      from: address,
+    });
   };
 
   return (
@@ -188,6 +203,8 @@ const RegisterLandForm = () => {
 };
 
 const RegisterPropertyForm = () => {
+  const { address } = useAccount();
+  const { registerProperty } = useAppContext();
   const [formData, setFormData] = useState({
     landIndex: "",
     numberOfRooms: "",
@@ -202,7 +219,6 @@ const RegisterPropertyForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
     const requiredFields: (keyof typeof formData)[] = ["landIndex", "numberOfRooms", "numberOfBathrooms", "price", "imageCID"];
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -210,7 +226,16 @@ const RegisterPropertyForm = () => {
         return;
       }
     }
-    console.log(formData);
+    registerProperty({
+      args: [
+        formData.landIndex,
+        formData.numberOfRooms,
+        formData.numberOfBathrooms,
+        formData.price,
+        formData.imageCID,
+      ],
+      from: address,
+    });
   };
 
   return (

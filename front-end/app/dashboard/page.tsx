@@ -13,6 +13,10 @@ import Footer from '@/app/components/Footer';
 import { useAppContext } from '@/app/context/AppContext';
 import AddPropertyModal from '@/app/components/modals/AddPropertyModal';
 import Image from 'next/image';
+import { useContractRead, useAccount } from 'wagmi';
+import { contractAddress, contractAbi } from '../config';
+import { useRouter } from 'next/navigation';
+import PropertyDetailsModal from '../components/modals/PropertyDetailsModal';
 
 // --- Mock Data and Types ---
 interface Asset {
@@ -43,7 +47,7 @@ interface UserData {
   details: {
     fullName: string;
     location: string;
-    [key: string]: any;
+    [key: string]: string | number;
   };
   walletAddress: string;
 }
@@ -119,62 +123,50 @@ const Dashboard = () => {
   const { isAddPropertyModalOpen, setAddPropertyModalOpen } = useAppContext();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { address } = useAccount();
+  const router = useRouter();
 
   // Dashboard state
   const [assets, setAssets] = useState<Asset[]>([]);
-  const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [role, setRole] = useState('Buyer'); // Default role
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const savedAssets = localStorage.getItem('assets');
-      setAssets(savedAssets ? JSON.parse(savedAssets) : []);
-    };
+  const { data: ownerRealEstates, isLoading: ownerLoading } = useContractRead({
+    address: contractAddress as `0x${string}`,
+    abi: contractAbi,
+    functionName: 'viewOwnerRealEstates',
+    account: address,
+  });
 
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  const { data: allRealEstateListings, isLoading: allLoading } = useContractRead({
+    address: contractAddress as `0x${string}`,
+    abi: contractAbi,
+    functionName: 'viewAllRealEstateListings',
+  });
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Simulate fetching user data and properties
-      setTimeout(() => {
-        const savedData = localStorage.getItem('userData');
-        if (savedData) {
-          const parsedData = JSON.parse(savedData);
-          setUserData(parsedData);
-          setRole(parsedData.role || 'Buyer');
-        } else {
-          // Mock user data if not in local storage for demo
-          const mockUser = {
-            role: 'Landowner',
-            details: { fullName: 'John Doe', location: 'Lagos, Nigeria' },
-            walletAddress: '0x123...abc'
-          };
-          setUserData(mockUser);
-          setRole(mockUser.role);
-          localStorage.setItem('userData', JSON.stringify(mockUser));
-        }
-
-        const savedAssets = localStorage.getItem('assets');
-        setAssets(savedAssets ? JSON.parse(savedAssets) : []);
-        setIsLoading(false);
-      }, 1500);
+      const savedData = localStorage.getItem('userData');
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        setUserData(parsedData);
+        setRole(parsedData.role || 'Buyer');
+      }
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !isLoading) {
-      localStorage.setItem('assets', JSON.stringify(assets));
+    if (role === 'Landowner' && ownerRealEstates) {
+      setAssets(ownerRealEstates as Asset[]);
+    } else if (role === 'Buyer' && allRealEstateListings) {
+      setAssets(allRealEstateListings as Asset[]);
     }
-  }, [assets, isLoading]);
+  }, [role, ownerRealEstates, allRealEstateListings]);
 
   const openModal = (asset: Asset | null) => {
-    setEditingAsset(asset);
     setAddPropertyModalOpen(true);
   };
 
@@ -199,9 +191,12 @@ const Dashboard = () => {
   };
 
   const handleViewDetails = (asset: Asset) => {
-    // setSelectedAsset(asset);
-    // setIsDetailsModalOpen(true);
-    console.log("View details for", asset)
+    setSelectedAsset(asset);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handlePurchase = (asset: Asset) => {
+    router.push(`/buy-property?asset=${JSON.stringify(asset)}`);
   };
 
   const filteredAssets = assets.filter(p => {
@@ -213,7 +208,7 @@ const Dashboard = () => {
     }
   });
 
-  if (isLoading) {
+  if (isLoading || ownerLoading || allLoading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white p-8">
         <div className="max-w-7xl mx-auto">
@@ -342,6 +337,13 @@ const Dashboard = () => {
       <AnimatePresence>
         {isAddPropertyModalOpen && <AddPropertyModal />}
       </AnimatePresence>
+
+      <PropertyDetailsModal 
+        isOpen={isDetailsModalOpen} 
+        onClose={() => setIsDetailsModalOpen(false)} 
+        asset={selectedAsset} 
+        onPurchase={handlePurchase}
+      />
 
       <AnimatePresence>
         {showDeleteModal && (

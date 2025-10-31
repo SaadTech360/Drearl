@@ -157,6 +157,9 @@ Phase	Milestone
 🔜 Phase 5	Cross-border real estate marketplace
 🛡️ Security & Compliance
 
+## Hashgrap certificate
+https://hashgraphdev.com/courses/hashgraph-developer-course
+
 
 Role-based access control for verifiers
 
